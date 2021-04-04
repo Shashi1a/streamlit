@@ -2,6 +2,7 @@ import streamlit as st
 import zipfile
 import tempfile
 import time
+import stqdm
 
 import random
 import os
@@ -52,8 +53,15 @@ if __name__ == "__main__":
     if all(v is not None for v in [data, model]):
         dim_1 = np.shape(data)[0]
 
-        result = model.predict(data)
+        st.title("Making predictions")
+        my_bar = st.progress(0)
 
+        result = model.predict(data)
+        time.sleep(1)
+        my_bar.progress(100)
+        st.success("Done")
+
+        time.sleep(2)
         img_id = []
         for i in range(9):
             img_id.append(random.randint(0, dim_1))
@@ -72,26 +80,30 @@ if __name__ == "__main__":
             2: 'Stripe',
             3: 'Paramagnet'
         }
+
         phase_count = {}
         for keys, values in res_count.items():
             # print(pred[keys], values)
             phase_count[pred[keys]] = values
 
-        if st.button("Press to see predictions"):
-            st.title("Predictions")
-            st.write(df)
-            # with st.beta_expander("Press to see counts"):
+        # if st.button("Press to see predictions"):
 
-            st.title("Count of configurations")
-            st.write(pd.Series(phase_count, name="Count"))
+        st.title("Predictions")
+        st.write(df)
 
-            st.title("Sample of images uploaded for the prediction")
+        st.title("Count of configurations")
+        st.write(pd.Series(phase_count, name="Count"))
 
-            fig = plt.figure(figsize=(3, 2))
-            for i, j in enumerate(img_id):
-                ax = fig.add_subplot(3, 3, (i+1))
-                plt.imshow(data[j])
-                plt.xticks([])
-                plt.yticks([])
-            plt.subplots_adjust(left=0.37, right=0.9, wspace=0.01, hspace=0.05)
-            st.pyplot(fig)
+        st.title("Sample of images uploaded for the prediction")
+
+        fig = plt.figure(figsize=(3, 2))
+        for i, j in enumerate(img_id):
+            ax = fig.add_subplot(3, 3, (i+1))
+            plt.imshow(data[j])
+            plt.xticks([])
+            plt.yticks([])
+        plt.subplots_adjust(left=0.37, right=0.9,
+                            wspace=0.01, hspace=0.05)
+        st.pyplot(fig)
+        time.sleep(1)
+        st.balloons()
